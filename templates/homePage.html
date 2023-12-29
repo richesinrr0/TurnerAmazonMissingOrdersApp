@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,600;1,500;1,700&family=Kanit:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style media="all">
+
+.full {
+    position:absolute;
+    top:12.5%;
+    left:12.5%;
+    background-color:rgba(230, 232, 236, 0.589);
+    height: 75%;
+    width: 75%;
+    text-align: center;
+}
+
+body {
+    background-color:rgb(252, 251, 250);
+    height: 100%;
+    width:100%;
+    top:0;
+}
+
+
+.title {
+    margin: 0;
+    padding:0;
+    font-family: 'Kanit', sans-serif;
+    font-size:1.6em;
+    background-color:rgba(36, 67, 170, 0.938);
+    text-align: center;
+    color:white
+}
+
+.subtitle {
+    margin: 0;
+    padding:0;
+    font-family: 'Kanit', sans-serif;
+    font-size:1.2em;
+    background-color:rgba(36, 67, 170, 0.808);
+    text-align: center;
+    color:white
+}
+
+
+.btn {
+    background: rgb(255,255,255);
+    color: #73787d;
+
+    /*centering button*/
+    display: block;
+    margin: 0 auto;
+    padding:3px;
+    transform:translateY(16px);
+
+    cursor: pointer;
+    align-items:center;
+    justify-content:center;
+    font-size: 16px;
+    font-family: 'Kanit', sans-serif;
+}
+
+label {
+    display: block;
+    font-size:22px;
+    padding-top:12px;
+    font-family: 'Kanit', sans-serif;
+}
+.text {
+    font-size:18px;
+    
+}
+
+.items {
+    padding-top:22px;
+    font-size: 22px;
+    color: rgba(36, 67, 170, 0.938);
+    z-index: -1;
+    font-family: 'Kanit', sans-serif;
+
+}
+
+input[type=text] {
+    border-radius:5px;
+}
+
+/*
+.chart{
+
+    position:absolute;
+    top:40%;
+    left:5%;
+    background-color:rgba(198, 201, 52, 0.589);
+    height: 50%;
+    width: 90%;
+    text-align: center;
+
+}
+
+.table {
+  width: 100%;
+}
+*/
+
+#loader1 {
+    padding-top:30px;
+    font-size: 22px;
+    color: rgba(36, 67, 170, 0.938);
+    z-index: -1;
+    font-family: 'Kanit', sans-serif;
+    
+}
+
+.loader-container-hidden {
+    display: none;
+}
+
+.top-banner-img {
+
+    position:absolute;
+    top:6%;
+    left:12.5%;
+    background-color: rgb(252, 251, 250);
+    height: 12%;
+    width: 75%;
+    text-align: center;
+
+}
+
+
+</style>
+</head>
+
+<body>
+    <div class="top-banner-img">
+        <div>
+            <!--width:140,height:55-->
+            <img src="static/img/newlogo.webp" 
+            alt="Turner Supply Logo"
+            width="30%"   
+            height="95%"/> 
+        </div>
+    </div>
+
+    <div class="full">
+        <p class="title">
+            Enter Desired Date Range
+        </p>
+        <p class="subtitle">
+            Date Format: yyyy-mm-dd
+        </p>
+
+        <p id="date"></p>
+        <form id="form" method="POST" action="/data" href="{{ url_for('data') }}" >
+            <label for="one">Start Date</label>
+            <input id="one" class="text" size="25" type="text" name="StartDate" required pattern="(19|20)\d{2}-(0[1-9]|1[1,2])-(0[1-9]|[12][0-9]|3[01])"/>
+            <label for="two">End Date</label>
+            <input id="two" class="text" size="25" type="text" name="EndDate" required pattern="(19|20)\d{2}-(0[1-9]|1[1,2])-(0[1-9]|[12][0-9]|3[01])"/> 
+            <input class="btn" type="submit" name="action" value="Submit"/>
+
+        </form>
+
+
+
+        <!--
+        <p class="items">{{ numItems }}</p>
+        
+        <div class="chart">
+            <table class="table">
+                {% for table in tables %}
+
+                    {{titles[loop.index]}}
+                    {{ table|safe }}
+
+                {% endfor %}
+            </table>
+
+        </div>
+    -->
+        
+        <div id="loader1" class="loader-container-hidden">
+            <p>Working</p>
+
+        </div>
+    </div>
+    
+</body>
+
+<script>
+    //function to display message after invalid input and reset it after submission
+    function verify(event){
+        document.querySelector("#one").addEventListener("invalid", function(){
+            this.setCustomValidity("Date format should be year-month-day Ex: 2023-12-05");
+        });
+
+        document.querySelector("#two").addEventListener("invalid", function(){
+            this.setCustomValidity("Date format should be year-month-day Ex: 2023-12-05");
+        });
+    }
+    //both js functions use this for element instance
+    const form = document.getElementById("form");
+    form.addEventListener("submit", verify);
+    
+    //fucntion to create loading animation
+    const loaderContainer1 = document.getElementById('loader1');
+    const states = ['Loading','Loading .','Loading . .','Loading . . .']
+    //sleep func
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async function logSubmit(event) {
+        console.log('loading')
+        loaderContainer1.classList.remove('loader-container-hidden');
+
+        for (let i = 0; i < 200; i++) {
+
+            loaderContainer1.textContent = states[0]
+            await sleep(1000);
+            loaderContainer1.textContent = states[1]
+            await sleep(1000);
+            loaderContainer1.textContent = states[2]
+            await sleep(1000);
+            loaderContainer1.textContent = states[3]
+            await sleep(1000);
+        }
+    }
+    //const form = document.getElementById("form");
+    form.addEventListener("submit", logSubmit);
+
+    //Flaskwebgui: Constantly Runs Flask Server
+    async function getRequest(url = '') {
+        const response = await fetch(url, {
+            method: 'GET',
+            cache: 'no-cache'
+        })
+        return response.json()
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        let url = document.location
+        let route = "/flaskwebgui-keep-server-alive"
+        let interval_request = 3 * 1000 //sec
+        function keep_alive_server() {
+            getRequest(url + route)
+                .then(data => console.log(data))
+        }
+        setInterval(keep_alive_server, interval_request)()
+    })        
+    
+</script>
